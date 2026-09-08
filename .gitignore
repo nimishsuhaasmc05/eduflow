@@ -1,0 +1,37 @@
+.env
+backend/.env
+*.db
+__pycache__/
+*.pyc
+node_modules/
+dist/
+venv/
+.idea/
+.vscode/
+*.prn
+
+# Large ML / dataset files
+*.zip
+*.avi
+*.mp4
+*.mov
+*.webm
+*.npy
+*.pth
+*.pt
+*.onnx
+
+# ML generated data
+EduFlow_ML/
+ml/
+scratch/
+
+# Environment / secrets
+.env
+backend/.env
+
+# User-uploaded profile photos
+backend/app/media/avatars/
+
+# Temporary Vite files
+*.timestamp-*.mjs

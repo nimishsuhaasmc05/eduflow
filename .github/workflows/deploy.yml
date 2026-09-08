@@ -1,0 +1,79 @@
+name: Edu-Flow CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: eduflow
+          POSTGRES_USER: eduflow_user
+          POSTGRES_PASSWORD: eduflow_secure_password_2026
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://eduflow_user:eduflow_secure_password_2026@localhost:5432/eduflow
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY: eduflow-ci-test-secret-key-2026
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Run Database Migrations
+        run: |
+          cd backend
+          python -m alembic upgrade head
+
+      - name: Compile Backend
+        run: |
+          cd backend
+          python -m compileall app main.py
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Build Docker Containers
+        run: |
+          docker-compose build
