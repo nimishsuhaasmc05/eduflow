@@ -41,6 +41,7 @@ class QuizAgent:
         if cache_key not in _QUESTION_BANK:
             return False
         bank = _QUESTION_BANK[cache_key]
+        excluded = set(str(x) for x in (exclude_question_ids or []))
         available = [
             q for q in bank
             if str(q.get("question_hash", "")) not in excluded

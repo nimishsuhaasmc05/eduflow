@@ -95,7 +95,7 @@ class GeminiProvider(AIProvider):
 
         try:
             from google.genai import types
-            candidates = [settings.GEMINI_MODEL, "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-flash-latest"]
+            candidates = [settings.GEMINI_MODEL]
             models_to_try = list(dict.fromkeys(c for c in candidates if c))
             
             schema_prompt = (
@@ -236,7 +236,7 @@ class GeminiProvider(AIProvider):
                 ]
             }}
             """
-            candidates = [settings.GEMINI_MODEL, "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-flash-latest"]
+            candidates = [settings.GEMINI_MODEL]
             models_to_try = list(dict.fromkeys(c for c in candidates if c))
             for model_name in models_to_try:
                 try:

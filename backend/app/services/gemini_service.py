@@ -192,7 +192,7 @@ Generate a JSON object with these exact keys:
 6. "sources": Array of reference citations (e.g. ["Video: {module_title}"]).
 """
 
-            models_to_try = [settings.GEMINI_MODEL, "gemini-2.0-flash", "gemini-1.5-flash"]
+            models_to_try = [settings.GEMINI_MODEL]
             models_to_try = list(dict.fromkeys(models_to_try))
             response = None
             last_err = None
@@ -452,7 +452,7 @@ Analyze the student's exact query "{topic_query}" and return a structured JSON o
 7. "sources": Array of 2-3 academic or authoritative reference sources.
 """
 
-            models_to_try = [settings.GEMINI_MODEL, "gemini-3.6-flash", "gemini-2.5-flash"]
+            models_to_try = [settings.GEMINI_MODEL]
             # Deduplicate preserving order
             models_to_try = list(dict.fromkeys(models_to_try))
             response = None

@@ -5,7 +5,12 @@ __pycache__/
 *.pyc
 node_modules/
 dist/
+# Virtual environments
 venv/
+.venv/
+.venv_new/
+backend/venv/
+backend/.venv_new/
 .idea/
 .vscode/
 *.prn
@@ -30,8 +35,16 @@ scratch/
 .env
 backend/.env
 
-# User-uploaded profile photos
-backend/app/media/avatars/
+# User-uploaded profile photos and media storage
+backend/media/
+backend/app/media/
+media/
+
+# Backup files
+*.gemini-backup
+*.audit_backup_*
+*.final_repair_backup_*
+*.backup_*
 
 # Temporary Vite files
 *.timestamp-*.mjs

@@ -389,6 +389,8 @@ class InterventionEngine:
                 logger.warning(f"Intervention {intervention_id} not found for resolution")
                 return False
 
+            st_id = log.student_id
+
             log.post_state = post_state
             log.post_attention = post_attention
             log.post_confusion = post_confusion
