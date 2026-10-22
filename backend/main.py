@@ -227,22 +227,31 @@ def seed_database():
                     pass
 
         # Seed 1 representative active Live Class
-        from app.models.live_class import LiveClass
-        active_class = db.query(LiveClass).filter(LiveClass.class_code == "EDF-701").first()
-        if not active_class:
-            active_class = LiveClass(
-                title="Real-Time Computer Vision & Socratic Tutoring Workshop",
-                description="Live interactive classroom exploring client-side MediaPipe landmark calculation and closed-loop feedback.",
-                teacher_id=teacher_user.id,
-                course_id=1,
-                module_id=1,
-                class_code="EDF-701",
-                join_token="live-class-showcase-token-701",
-                status="LIVE"
-            )
-            db.add(active_class)
-            db.commit()
+        try:
+            from app.models.live_class import LiveClass
+            active_class = db.query(LiveClass).filter(LiveClass.class_code == "EDF-701").first()
+            if not active_class:
+                first_course = db.query(Course).first()
+                first_module = db.query(Module).filter(Module.course_id == first_course.id).first() if first_course else None
+                active_class = LiveClass(
+                    title="Real-Time Computer Vision & Socratic Tutoring Workshop",
+                    description="Live interactive classroom exploring client-side MediaPipe landmark calculation and closed-loop feedback.",
+                    teacher_id=teacher_user.id if teacher_user else (first_course.teacher_id if first_course else 1),
+                    course_id=first_course.id if first_course else None,
+                    module_id=first_module.id if first_module else None,
+                    class_code="EDF-701",
+                    join_token="live-class-showcase-token-701",
+                    status="LIVE"
+                )
+                db.add(active_class)
+                db.commit()
+        except Exception as lc_err:
+            db.rollback()
+            print(f"Notice: Live class seed notice: {lc_err}")
 
+    except Exception as e:
+        db.rollback()
+        print(f"Notice: Database seed notice (non-fatal): {e}")
     finally:
         db.close()
 
