@@ -9,7 +9,7 @@ import { CertificateModal } from './CertificateModal';
 import { Course, Module } from '../../types';
 import { courseApi } from '../../services/api';
 import { isYouTubeUrl, getYouTubeEmbedUrl, getYouTubeWatchUrl, getVideoType } from '../../utils/video';
-import { Play, Pause, Sparkles, HelpCircle, CheckCircle2, RotateCcw, Award, ExternalLink, AlertTriangle, Video, Zap } from 'lucide-react';
+import { Play, Pause, Sparkles, HelpCircle, CheckCircle2, RotateCcw, Award, ExternalLink, AlertTriangle, Video, Zap, Bot, Camera, Activity } from 'lucide-react';
 
 import { quizPrefetchService } from '../../services/quizPrefetchService';
 import { attentionActivityPrefetchService } from '../../services/attentionActivityPrefetchService';
@@ -19,8 +19,16 @@ interface LearningPlayerProps {
 }
 
 export const LearningPlayer: React.FC<LearningPlayerProps> = ({ course }) => {
-  const { activeIntervention, dismissIntervention, metrics, setCurrentContext, stopWebcam } = useAffective();
+  const { activeIntervention, dismissIntervention, metrics, setCurrentContext, stopWebcam, startWebcam, status, fps, faceDetected } = useAffective();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [activeCompanionTab, setActiveCompanionTab] = useState<'tutor' | 'biometrics'>('tutor');
+
+  const handleStartCamera = async () => {
+    setActiveCompanionTab('biometrics');
+    setTimeout(() => {
+      startWebcam().catch((err) => console.error("Webcam start error:", err));
+    }, 50);
+  };
 
   // HIGH-PRIORITY: Turn OFF camera immediately when student exits learning/video player component
   useEffect(() => {
@@ -28,6 +36,7 @@ export const LearningPlayer: React.FC<LearningPlayerProps> = ({ course }) => {
       stopWebcam();
     };
   }, [stopWebcam]);
+
   
   const modules = course?.modules || [];
   const [activeModuleIndex, setActiveModuleIndex] = useState<number>(0);
@@ -400,17 +409,138 @@ export const LearningPlayer: React.FC<LearningPlayerProps> = ({ course }) => {
           )}
         </div>
 
-        {/* Vision Telemetry Sensors */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Sleek Compact Affective Telemetry Strip (Distraction-Free, No Bottom Mess) */}
+        <div className="glass-panel rounded-2xl p-3.5 border border-slate-800 bg-slate-900/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          {/* Left: Camera Status & Trigger */}
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  status === 'CONNECTED' ? 'bg-cyan-400' : 'bg-slate-500'
+                }`}></span>
+                <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                  status === 'CONNECTED' ? 'bg-cyan-400' : 'bg-slate-500'
+                }`}></span>
+              </span>
+              <span className="text-xs font-bold text-slate-200">
+                {status === 'CONNECTED' ? `Live Telemetry (${fps} FPS)` : 'Webcam Standby'}
+              </span>
+            </div>
+
+            {status !== 'CONNECTED' ? (
+              <button
+                type="button"
+                onClick={handleStartCamera}
+                className="px-2.5 py-1 rounded-lg bg-cyan-500 text-slate-950 font-bold text-[11px] hover:bg-cyan-400 transition-all flex items-center space-x-1 shadow-sm"
+              >
+                <Play className="w-3 h-3 fill-current" />
+                <span>Start Camera</span>
+              </button>
+            ) : (
+
+              <button
+                type="button"
+                onClick={stopWebcam}
+                className="px-2 py-0.5 rounded text-[11px] text-rose-400 hover:bg-rose-950/40 border border-rose-500/30 transition-all"
+              >
+                Stop Camera
+              </button>
+            )}
+          </div>
+
+          {/* Center: Live Attention Score Gauge */}
+          <div className="flex items-center space-x-3 flex-1 max-w-xs min-w-[160px]">
+            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Attention:</span>
+            <div className="flex-1 bg-slate-800 h-2 rounded-full overflow-hidden p-0.5">
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  (metrics.attention ?? 0) >= 0.7
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-400'
+                    : (metrics.attention ?? 0) >= 0.4
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                    : 'bg-gradient-to-r from-rose-500 to-pink-500'
+                }`}
+                style={{ width: `${Math.round((metrics.attention ?? 0) * 100)}%` }}
+              />
+            </div>
+            <span className="font-mono text-xs font-bold text-cyan-400">
+              {Math.round((metrics.attention ?? 0) * 100)}%
+            </span>
+          </div>
+
+          {/* Right: State Pill + Toggle to Camera/Biometrics Tab */}
+          <div className="flex items-center space-x-2">
+            <span className={`px-2.5 py-0.5 rounded-full border text-[11px] font-bold font-mono ${
+              metrics.primary_state === 'CONFUSION' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
+              metrics.primary_state === 'BOREDOM' ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' :
+              metrics.primary_state === 'DISTRACTION' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' :
+              metrics.primary_state === 'HIGH_COGNITIVE_LOAD' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' :
+              'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+            }`}>
+              {metrics.primary_state || 'ENGAGED'}
+            </span>
+
+
+            <button
+              type="button"
+              onClick={() => setActiveCompanionTab(activeCompanionTab === 'biometrics' ? 'tutor' : 'biometrics')}
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center space-x-1"
+              title="Toggle between AI Tutor and Camera Biometrics"
+            >
+              <Activity className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{activeCompanionTab === 'biometrics' ? 'Open AI Chat' : 'View Camera & HUD'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column: Studio Companion Panel (Tabbed AI Tutor / Biometrics & Camera) */}
+      <div className="space-y-3">
+        {/* Sleek Companion Header Tabs */}
+        <div className="flex items-center rounded-2xl bg-slate-900 border border-slate-800 p-1.5 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setActiveCompanionTab('tutor')}
+            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeCompanionTab === 'tutor'
+                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Bot className="w-4 h-4 text-cyan-400" />
+            <span>AI Socratic Tutor</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveCompanionTab('biometrics')}
+            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeCompanionTab === 'biometrics'
+                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Camera className="w-4 h-4 text-cyan-400" />
+            <span>Camera & Biometrics</span>
+            {status === 'CONNECTED' && (
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse ml-1"></span>
+            )}
+          </button>
+        </div>
+
+        {/* Tab 1: AI Tutor Assistant */}
+        <div className={activeCompanionTab === 'tutor' ? 'block' : 'hidden'}>
+          <AITutorSidebar course={course} module={activeModule} onTimestampSeek={handleTimestampSeek} />
+        </div>
+
+        {/* Tab 2: Camera Tracker & HUD Diagnostics (Keep mounted so videoRef is always valid) */}
+        <div className={activeCompanionTab === 'biometrics' ? 'block h-[650px] overflow-y-auto space-y-4 pr-1 scrollbar-thin' : 'hidden'}>
           <WebcamMonitor />
           <AffectiveHUD />
         </div>
       </div>
 
-      {/* Right Column: AI Tutor Chat Assistant (Connected to Active Video/Module) */}
-      <div className="space-y-6">
-        <AITutorSidebar course={course} module={activeModule} onTimestampSeek={handleTimestampSeek} />
-      </div>
+
 
       {/* Modals */}
       {showQuizModal && (

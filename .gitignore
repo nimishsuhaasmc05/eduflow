@@ -1,50 +1,96 @@
+# ========================
+# Environment / Secrets
+# ========================
 .env
-backend/.env
-*.db
+.env.local
+.env.*.local
+
+# ========================
+# OS generated files
+# ========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+.vscode/
+*.iml
+*.code-workspace
+
+# ========================
+# Python (Backend / ML)
+# ========================
 __pycache__/
-*.pyc
-node_modules/
-dist/
-# Virtual environments
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+*.whl
 venv/
 .venv/
 .venv_new/
 backend/venv/
 backend/.venv_new/
-.idea/
-.vscode/
-*.prn
+env/
+*.db
+*.sqlite3
 
-# Large ML / dataset files
+# ========================
+# Node / Frontend
+# ========================
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+*.timestamp-*.mjs
+
+# ========================
+# Large ML / Dataset files
+# ========================
 *.zip
+*.tar.gz
 *.avi
 *.mp4
 *.mov
 *.webm
 *.npy
+*.npz
+*.h5
+*.hdf5
 *.pth
 *.pt
 *.onnx
+*.pkl
+*.pickle
+*.joblib
 
-# ML generated data
-EduFlow_ML/
-ml/
-scratch/
+# ML generated data & weights
+ml/models/weights/
+ml/data/
 
-# Environment / secrets
-.env
-backend/.env
-
-# User-uploaded profile photos and media storage
+# ========================
+# Media / Uploads
+# ========================
 backend/media/
 backend/app/media/
 media/
 
+# ========================
 # Backup files
+# ========================
 *.gemini-backup
 *.audit_backup_*
 *.final_repair_backup_*
 *.backup_*
 
-# Temporary Vite files
-*.timestamp-*.mjs
+# ========================
+# Misc
+# ========================
+*.prn
+*.log
+scratch/

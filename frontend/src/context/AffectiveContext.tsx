@@ -3,6 +3,7 @@ import { AffectiveMetrics, ClosedLoopIntervention, WebcamStatus } from '../types
 import { ClientVisionEngine, FacialLandmark, VisionState } from '../services/visionEngine';
 import { closedLoopController } from '../services/closedLoopController';
 import { attentionMonitor } from '../services/attentionMonitor';
+import type { AffectInferenceResult } from '../services/affectInferenceService';
 
 interface AffectiveContextType {
   metrics: AffectiveMetrics;
@@ -82,10 +83,27 @@ export const AffectiveProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     if (state.status === 'CONNECTED') {
       setIsMonitoring(true);
-      // Derive affective metrics on every frame internally
-      const derivedMetrics = attentionMonitor.deriveAffectiveMetrics(updatedLandmarks, state.fps);
 
-      // Evaluate telemetry with actual course context
+      // 1. Derive geometric/landmark-based affective metrics
+      const landmarkMetrics = attentionMonitor.deriveAffectiveMetrics(updatedLandmarks, state.fps);
+
+      // 2. If the ONNX model has a live result, fuse neural outputs with landmark metrics
+      //    Weight: 70% neural inference + 30% geometric landmarks
+      const onnx: AffectInferenceResult | undefined = state.affectResult;
+      const derivedMetrics: AffectiveMetrics = onnx?.isLiveInference
+        ? {
+            attention:     onnx.attention     * 0.70 + landmarkMetrics.attention     * 0.30,
+            confusion:     onnx.confusion     * 0.70 + landmarkMetrics.confusion     * 0.30,
+            boredom:       onnx.boredom       * 0.70 + landmarkMetrics.boredom       * 0.30,
+            engagement:    onnx.engagement    * 0.70 + landmarkMetrics.engagement    * 0.30,
+            distraction:   (1 - onnx.engagement) * 0.70 + landmarkMetrics.distraction * 0.30,
+            cognitive_load: onnx.cognitive_load * 0.70 + landmarkMetrics.cognitive_load * 0.30,
+            primary_state:  onnx.primary_state  as AffectiveMetrics['primary_state'],
+            fps: state.fps,
+          }
+        : landmarkMetrics;
+
+      // 3. Evaluate telemetry with fused metrics
       closedLoopController.evaluateMetrics(
         courseIdRef.current,
         moduleIdRef.current,

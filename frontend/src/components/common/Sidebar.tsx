@@ -45,7 +45,7 @@ export const Sidebar: React.FC = () => {
   const links = role === 'admin' ? adminLinks : role === 'teacher' ? teacherLinks : studentLinks;
 
   return (
-    <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col p-4 space-y-6 shadow-sm transition-colors duration-200">
+    <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col p-4 space-y-6 shadow-sm transition-colors duration-200">
       <div className="space-y-3">
         <div className="px-3 text-xs font-mono font-bold tracking-wider text-slate-500 dark:text-slate-400">
           Navigation Menu

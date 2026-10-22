@@ -50,6 +50,7 @@ class QuizAgent:
         ]
         return len(available) >= min_count
 
+
     @classmethod
     def invalidate_cache(cls, course_id: Optional[int] = None, module_id: Optional[int] = None) -> None:
         """Clear question bank when course or module content changes."""

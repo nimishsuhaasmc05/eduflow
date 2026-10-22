@@ -1,5 +1,6 @@
 import { WebcamStatus, FacialPoint } from '../types';
 import { attentionMonitor } from './attentionMonitor';
+import { affectInferenceService, AffectInferenceResult } from './affectInferenceService';
 
 declare global {
   interface Window {
@@ -16,6 +17,8 @@ export interface VisionState {
   landmarkCount: number;
   errorMessage: string | null;
   faceDetected: boolean;
+  /** Latest ONNX affective inference result (undefined until first result) */
+  affectResult?: AffectInferenceResult;
 }
 
 export type VisionStateCallback = (state: VisionState, landmarks: FacialPoint[]) => void;
@@ -35,6 +38,9 @@ export class ClientVisionEngine {
   private lastFpsUpdate: number = performance.now();
   private currentFps: number = 0;
 
+  // ONNX inference — latest cached result
+  private lastAffectResult: AffectInferenceResult | undefined = undefined;
+
   // Internal State
   private currentState: VisionState = {
     status: 'OFFLINE',
@@ -42,6 +48,7 @@ export class ClientVisionEngine {
     landmarkCount: 0,
     errorMessage: null,
     faceDetected: false,
+    affectResult: undefined,
   };
 
   private log(stage: string, detail?: any) {
@@ -81,6 +88,9 @@ export class ClientVisionEngine {
     this.callback = onUpdate;
     this.isRunning = true;
     this.isMediaPipeInitialized = false;
+
+    // Kick off ONNX model loading in background (non-blocking)
+    affectInferenceService.init().catch(() => {/* graceful degradation */});
 
     this.updateState({ status: 'INITIALIZING', errorMessage: null });
     this.log('Stage 1: Checking browser context & camera support...');
@@ -223,6 +233,14 @@ export class ClientVisionEngine {
       }
     }
 
+    // Run ONNX affect inference (internally throttled to ~2 Hz)
+    if (this.videoElement && affectInferenceService.isReady) {
+      affectInferenceService
+        .infer(this.videoElement, landmarks)
+        .then((result) => { this.lastAffectResult = result; })
+        .catch(() => {/* ignore — cached last result is used */});
+    }
+
     this.processFrameLandmarks(landmarks, detected);
   };
 
@@ -268,6 +286,7 @@ export class ClientVisionEngine {
       fps: this.currentFps,
       landmarkCount: landmarks.length,
       faceDetected: detected,
+      affectResult: this.lastAffectResult,
     });
 
     if (this.callback) {

@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useAffective } from '../../context/AffectiveContext';
 import { ThemeToggle } from './ThemeToggle';
-import { BrainCircuit, ShieldCheck, LogOut, Activity } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { BrainCircuit, ShieldCheck, LogOut, Activity, Menu, X, LayoutDashboard, Video, Compass, BookOpen, Trophy, BarChart3, Settings } from 'lucide-react';
+import { Link, useNavigate, NavLink } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { metrics, isMonitoring } = useAffective();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getStatusBadge = () => {
     switch (metrics.primary_state) {
@@ -19,6 +20,16 @@ export const Navbar: React.FC = () => {
       default: return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
     }
   };
+
+  const navLinks = [
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/live', label: 'Online Classes', icon: Video },
+    { to: '/explore', label: 'Explore Courses', icon: Compass },
+    { to: '/library', label: 'Digital Library', icon: BookOpen },
+    { to: '/leaderboard', label: 'Leaderboard & XP', icon: Trophy },
+    { to: '/analytics', label: 'Cognitive Reports', icon: BarChart3 },
+    { to: '/profile', label: 'Profile Settings', icon: Settings },
+  ];
 
   return (
     <nav className="h-14 border-b border-slate-200 dark:border-[#26323A] bg-white/95 dark:bg-[#080B0F]/95 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40 font-sans transition-colors duration-150">
@@ -92,6 +103,15 @@ export const Navbar: React.FC = () => {
             >
               <LogOut className="w-4 h-4" />
             </button>
+
+            {/* Mobile Hamburger Toggle (Visible only on mobile) */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Toggle Mobile Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
@@ -104,6 +124,38 @@ export const Navbar: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Drawer Overlay (Prevents UI overlapping and ensures clean mobile navigation) */}
+      {mobileMenuOpen && user && (
+        <div className="md:hidden fixed inset-x-0 top-14 bg-white/95 dark:bg-[#080B0F]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 p-4 space-y-2 z-50 shadow-2xl animate-fade-in">
+          <div className="px-3 pb-2 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+            Navigation Menu
+          </div>
+          <div className="grid grid-cols-1 gap-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-cyan-50 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4 text-cyan-400" />
+                  <span>{link.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
+

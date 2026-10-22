@@ -192,7 +192,7 @@ Generate a JSON object with these exact keys:
 6. "sources": Array of reference citations (e.g. ["Video: {module_title}"]).
 """
 
-            models_to_try = [settings.GEMINI_MODEL]
+            models_to_try = [settings.GEMINI_MODEL, "gemini-2.5-flash", "gemini-1.5-flash"]
             models_to_try = list(dict.fromkeys(models_to_try))
             response = None
             last_err = None

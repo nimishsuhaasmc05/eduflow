@@ -9,6 +9,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Exclude onnxruntime-web from Vite pre-bundling so its internal
+  // dynamic WASM/MJS imports work correctly at runtime.
+  optimizeDeps: {
+    exclude: ['onnxruntime-web'],
+  },
   server: {
     port: 5173,
     host: true,

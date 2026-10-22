@@ -397,12 +397,14 @@ class InterventionEngine:
             log.post_engagement = post_engagement
             log.quiz_score = quiz_score
             log.resolved_at = datetime.utcnow()
+            st_id = log.student_id
 
             # Compute success based on objective outcome evidence
             itype = log.intervention_type or ""
             if itype == "ATTENTION_ACTIVITY":
                 success = True
                 cls._ineffective_quiz_counts[st_id] = 0
+
             elif "QUIZ" in itype:
                 if quiz_score is not None:
                     # Honest mastery evaluation: score >= 50% indicates effective micro-quiz intervention
