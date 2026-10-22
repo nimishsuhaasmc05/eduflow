@@ -51,6 +51,7 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           cd backend
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run Database Migrations
@@ -76,4 +77,4 @@ jobs:
 
       - name: Build Docker Containers
         run: |
-          docker-compose build
+          docker compose build || docker-compose build
