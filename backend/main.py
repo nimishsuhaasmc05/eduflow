@@ -202,14 +202,19 @@ def seed_database():
                 db.commit()
                 db.refresh(c)
 
-                for order, (title, desc, duration, transcript) in enumerate(course_data["modules"], start=1):
+                for order, mod_tuple in enumerate(course_data["modules"], start=1):
+                    title = mod_tuple[0]
+                    desc = mod_tuple[1]
+                    duration = mod_tuple[2]
+                    v_url = mod_tuple[3] if len(mod_tuple) > 4 else "/media/sample_course_video.mp4"
+                    transcript = mod_tuple[4] if len(mod_tuple) > 4 else (mod_tuple[3] if len(mod_tuple) > 3 else "")
                     db.add(Module(
                         course_id=c.id,
                         title=title,
                         description=desc,
                         order=order,
                         duration_minutes=duration,
-                        video_url="/media/sample_course_video.mp4",
+                        video_url=v_url or "/media/sample_course_video.mp4",
                         transcript=transcript,
                     ))
                 db.commit()
