@@ -77,4 +77,4 @@ jobs:
 
       - name: Build Docker Containers
         run: |
-          docker compose build || docker-compose build
+          docker compose build
