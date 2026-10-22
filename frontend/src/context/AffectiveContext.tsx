@@ -90,18 +90,46 @@ export const AffectiveProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       // 2. If the ONNX model has a live result, fuse neural outputs with landmark metrics
       //    Weight: 70% neural inference + 30% geometric landmarks
       const onnx: AffectInferenceResult | undefined = state.affectResult;
-      const derivedMetrics: AffectiveMetrics = onnx?.isLiveInference
-        ? {
-            attention:     onnx.attention     * 0.70 + landmarkMetrics.attention     * 0.30,
-            confusion:     onnx.confusion     * 0.70 + landmarkMetrics.confusion     * 0.30,
-            boredom:       onnx.boredom       * 0.70 + landmarkMetrics.boredom       * 0.30,
-            engagement:    onnx.engagement    * 0.70 + landmarkMetrics.engagement    * 0.30,
-            distraction:   (1 - onnx.engagement) * 0.70 + landmarkMetrics.distraction * 0.30,
-            cognitive_load: onnx.cognitive_load * 0.70 + landmarkMetrics.cognitive_load * 0.30,
-            primary_state:  onnx.primary_state  as AffectiveMetrics['primary_state'],
-            fps: state.fps,
-          }
-        : landmarkMetrics;
+      let derivedMetrics: AffectiveMetrics;
+
+      if (onnx?.isLiveInference) {
+        const fusedAtt = onnx.attention * 0.70 + landmarkMetrics.attention * 0.30;
+        const fusedConf = onnx.confusion * 0.70 + landmarkMetrics.confusion * 0.30;
+        const fusedBoredom = onnx.boredom * 0.70 + landmarkMetrics.boredom * 0.30;
+        const fusedEngage = onnx.engagement * 0.70 + landmarkMetrics.engagement * 0.30;
+        const fusedDist = (1 - onnx.engagement) * 0.70 + landmarkMetrics.distraction * 0.30;
+        const fusedCog = onnx.cognitive_load * 0.70 + landmarkMetrics.cognitive_load * 0.30;
+
+        let primary_state: AffectiveMetrics['primary_state'] = 'FOCUSED';
+        const finalAttPercent = Math.round(fusedAtt * 100);
+
+        if (!state.faceDetected || updatedLandmarks.length === 0) {
+          primary_state = 'INSUFFICIENT_DATA';
+        } else if (fusedDist >= 0.55 || landmarkMetrics.primary_state === 'DISTRACTION' || finalAttPercent < 45) {
+          primary_state = 'DISTRACTION';
+        } else if (fusedConf >= 0.50 || landmarkMetrics.primary_state === 'CONFUSION') {
+          primary_state = 'CONFUSION';
+        } else if (fusedBoredom >= 0.60 || landmarkMetrics.primary_state === 'BOREDOM') {
+          primary_state = 'BOREDOM';
+        } else if (finalAttPercent >= 68) {
+          primary_state = 'FOCUSED';
+        } else {
+          primary_state = 'ENGAGED';
+        }
+
+        derivedMetrics = {
+          attention: Number(fusedAtt.toFixed(2)),
+          confusion: Number(fusedConf.toFixed(2)),
+          boredom: Number(fusedBoredom.toFixed(2)),
+          engagement: Number(fusedEngage.toFixed(2)),
+          distraction: Number(fusedDist.toFixed(2)),
+          cognitive_load: Number(fusedCog.toFixed(2)),
+          primary_state,
+          fps: state.fps,
+        };
+      } else {
+        derivedMetrics = landmarkMetrics;
+      }
 
       // 3. Evaluate telemetry with fused metrics
       closedLoopController.evaluateMetrics(

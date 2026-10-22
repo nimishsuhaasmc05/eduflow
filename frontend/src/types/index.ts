@@ -80,7 +80,7 @@ export interface AffectiveMetrics {
   engagement: number;    // 0.0 to 1.0
   distraction: number;   // 0.0 to 1.0
   cognitive_load: number;// 0.0 to 1.0
-  primary_state: 'ENGAGED' | 'CONFUSION' | 'DISTRACTION' | 'BOREDOM' | 'HIGH_COGNITIVE_LOAD';
+  primary_state: 'FOCUSED' | 'ENGAGED' | 'LOW_ENGAGEMENT' | 'INSUFFICIENT_DATA' | 'CONFUSION' | 'DISTRACTION' | 'BOREDOM' | 'HIGH_COGNITIVE_LOAD';
   fps: number;
 }
 

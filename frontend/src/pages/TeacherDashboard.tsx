@@ -143,16 +143,16 @@ export const TeacherDashboard: React.FC = () => {
     <div className="space-y-8">
       
       {/* Header Banner */}
-      <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#11171D] rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-[#26323A] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 text-xs font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 text-xs font-bold uppercase tracking-wider mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
             <span>Course Management Command Center</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Good morning, {user?.full_name?.split(' ')[0] || 'Dr. Sarah'} 👋
           </h1>
-          <p className="text-xs text-slate-600 mt-1">Manage your courses and understand your learners with real-time telemetry.</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Manage your courses and understand your learners with real-time telemetry.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -171,9 +171,9 @@ export const TeacherDashboard: React.FC = () => {
 
           <button
             onClick={() => setAiReportGenerated(true)}
-            className="px-4 py-2.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm"
+            className="px-4 py-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm"
           >
-            <Sparkles className="w-4 h-4 text-purple-600" />
+            <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             <span>Generate AI Class Report</span>
           </button>
 
@@ -182,7 +182,7 @@ export const TeacherDashboard: React.FC = () => {
               setSelectedCourseForEdit(null);
               setShowEditorModal(true);
             }}
-            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition-all flex items-center space-x-2 shadow-sm"
+            className="px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-cyan-500 hover:bg-slate-800 dark:hover:bg-cyan-400 text-white dark:text-black font-extrabold text-xs transition-all flex items-center space-x-2 shadow-sm"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>+ Create New Course</span>
@@ -192,15 +192,15 @@ export const TeacherDashboard: React.FC = () => {
 
       {/* Generated AI Digest Alert */}
       {aiReportGenerated && (
-        <div className="bg-purple-50 p-5 rounded-2xl border border-purple-200 text-purple-900 space-y-2 shadow-sm">
+        <div className="bg-purple-50 dark:bg-purple-950/40 p-5 rounded-2xl border border-purple-200 dark:border-purple-800/60 text-purple-900 dark:text-purple-200 space-y-2 shadow-sm">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-purple-800 flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-purple-800 dark:text-purple-300 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span>Automated AI Pedagogical Intervention Digest</span>
             </h4>
-            <button onClick={() => setAiReportGenerated(false)} className="text-xs text-purple-600 hover:text-purple-900 font-bold">✕</button>
+            <button onClick={() => setAiReportGenerated(false)} className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-white font-bold">✕</button>
           </div>
-          <p className="text-xs text-purple-900 leading-relaxed">
+          <p className="text-xs text-purple-900 dark:text-purple-300 leading-relaxed">
             <strong>Key Finding:</strong> Module 1 timestamp 01:30 triggered high confusion (78%) due to multi-variable calculus equations. Edu-Flow closed-loop engine delivered 3D interactive diagrams which brought average class comprehension back to 92%.
           </p>
         </div>
@@ -208,48 +208,48 @@ export const TeacherDashboard: React.FC = () => {
 
       {/* Statistics Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Courses</span>
-          <div className="text-2xl font-extrabold text-slate-900 font-mono">{courses.length}</div>
+          <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-mono">{courses.length}</div>
           <p className="text-[10px] text-slate-500 font-medium">Authoring Catalog</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Published</span>
-          <div className="text-2xl font-extrabold text-emerald-600 font-mono">{publishedCount}</div>
-          <p className="text-[10px] text-emerald-700 font-medium">Active in Student Hub</p>
+          <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">{publishedCount}</div>
+          <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">Active in Student Hub</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Drafts</span>
-          <div className="text-2xl font-extrabold text-amber-600 font-mono">{draftCount}</div>
-          <p className="text-[10px] text-amber-700 font-medium">Under Preparation</p>
+          <div className="text-2xl font-extrabold text-amber-600 dark:text-amber-400 font-mono">{draftCount}</div>
+          <p className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">Under Preparation</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Students</span>
-          <div className="text-2xl font-extrabold text-cyan-600 font-mono">156</div>
+          <div className="text-2xl font-extrabold text-cyan-600 dark:text-cyan-400 font-mono">156</div>
           <p className="text-[10px] text-slate-500 font-medium">Enrolled Learners</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Avg Completion</span>
-          <div className="text-2xl font-extrabold text-purple-600 font-mono">78%</div>
+          <div className="text-2xl font-extrabold text-purple-600 dark:text-purple-400 font-mono">78%</div>
           <p className="text-[10px] text-slate-500 font-medium">+12% vs last term</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-white dark:bg-[#11171D] rounded-2xl p-4 border border-slate-200 dark:border-[#26323A] shadow-sm space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Avg Attention</span>
-          <div className="text-2xl font-extrabold text-indigo-600 font-mono">88%</div>
+          <div className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono">88%</div>
           <p className="text-[10px] text-slate-500 font-medium">MediaPipe Telemetry</p>
         </div>
       </div>
 
       {/* Course Management Section */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-            <BookOpen className="w-5 h-5 text-cyan-600" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-[#26323A] pb-3">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+            <BookOpen className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             <span>My Authoring Courses</span>
           </h2>
 
@@ -257,7 +257,7 @@ export const TeacherDashboard: React.FC = () => {
             <button
               onClick={() => setActiveFilter('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                activeFilter === 'all' ? 'bg-cyan-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
+                activeFilter === 'all' ? 'bg-cyan-600 text-white' : 'bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#26323A] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               All ({courses.length})
@@ -265,7 +265,7 @@ export const TeacherDashboard: React.FC = () => {
             <button
               onClick={() => setActiveFilter('published')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                activeFilter === 'published' ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
+                activeFilter === 'published' ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#26323A] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Published ({publishedCount})
@@ -273,7 +273,7 @@ export const TeacherDashboard: React.FC = () => {
             <button
               onClick={() => setActiveFilter('draft')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                activeFilter === 'draft' ? 'bg-amber-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
+                activeFilter === 'draft' ? 'bg-amber-600 text-white' : 'bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#26323A] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Drafts ({draftCount})
@@ -285,9 +285,9 @@ export const TeacherDashboard: React.FC = () => {
         {loading ? (
           <div className="p-8 text-center text-slate-500 text-xs font-semibold">Loading course catalog...</div>
         ) : filteredCourses.length === 0 ? (
-          <div className="bg-white p-8 rounded-3xl text-center border border-dashed border-slate-300 space-y-3">
+          <div className="bg-white dark:bg-[#11171D] p-8 rounded-3xl text-center border border-dashed border-slate-300 dark:border-[#26323A] space-y-3">
             <BookOpen className="w-8 h-8 text-slate-400 mx-auto" />
-            <h3 className="text-sm font-bold text-slate-800">No courses found</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No courses found</h3>
             <p className="text-xs text-slate-500">Click "+ Create New Course" above to author your first curriculum.</p>
           </div>
         ) : (
@@ -310,9 +310,9 @@ export const TeacherDashboard: React.FC = () => {
       </div>
 
       {/* Class Telemetry & Heatmap Sections */}
-      <div className="space-y-6 pt-4 border-t border-slate-200">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-          <BarChart3 className="w-5 h-5 text-indigo-600" />
+      <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-[#26323A]">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           <span>Real-Time Class Affective Analytics</span>
         </h2>
         <AffectiveHeatmap />
@@ -336,18 +336,18 @@ export const TeacherDashboard: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {courseToDelete && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-xl">
+          <div className="bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#26323A] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-xl">
             <div className="flex items-center space-x-3 text-rose-600">
               <AlertTriangle className="w-6 h-6 shrink-0" />
-              <h3 className="text-base font-bold text-slate-900">Delete Course Confirmation</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Delete Course Confirmation</h3>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Are you sure you want to delete <strong>"{courseToDelete.title}"</strong>? This will permanently remove the course, modules, and enrollments from PostgreSQL.
             </p>
             <div className="flex justify-end space-x-3 pt-2">
               <button
                 onClick={() => setCourseToDelete(null)}
-                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-[#26323A] text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>

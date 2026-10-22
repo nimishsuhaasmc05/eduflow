@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, BookOpen, Compass, Trophy, BarChart3, Settings, 
-  LogOut, Video, Users, UserCheck
+  LogOut, Video, Users, UserCheck, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState<boolean>(false);
   const role = user?.role || 'student';
 
   const studentLinks = [
@@ -45,11 +46,26 @@ export const Sidebar: React.FC = () => {
   const links = role === 'admin' ? adminLinks : role === 'teacher' ? teacherLinks : studentLinks;
 
   return (
-    <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col p-4 space-y-6 shadow-sm transition-colors duration-200">
-      <div className="space-y-3">
-        <div className="px-3 text-xs font-mono font-bold tracking-wider text-slate-500 dark:text-slate-400">
-          Navigation Menu
-        </div>
+    <aside
+      className={`hidden md:flex shrink-0 border-r border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0B0F17] flex-col transition-all duration-300 relative select-none ${
+        collapsed ? 'w-16 p-2' : 'w-56 p-3.5'
+      }`}
+    >
+      {/* Collapse Toggle Button */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -right-3 top-5 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white shadow-sm z-30 transition-transform"
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+      </button>
+
+      <div className="space-y-2 flex-1">
+        {!collapsed && (
+          <div className="px-2.5 py-1 text-[11px] font-mono font-medium tracking-wider text-slate-400 dark:text-slate-500 uppercase">
+            Menu
+          </div>
+        )}
         <nav className="space-y-1">
           {links.map((link) => {
             const Icon = link.icon;
@@ -57,38 +73,37 @@ export const Sidebar: React.FC = () => {
               <NavLink
                 key={link.to}
                 to={link.to}
+                title={collapsed ? link.label : undefined}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  `flex items-center rounded-lg text-xs font-medium transition-all ${
+                    collapsed ? 'justify-center p-2.5' : 'space-x-3 px-3 py-2'
+                  } ${
                     isActive
-                      ? 'bg-cyan-50 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-semibold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
                   }`
                 }
               >
-                <Icon className="w-4 h-4" />
-                <span>{link.label}</span>
+                <Icon className="w-4 h-4 shrink-0" />
+                {!collapsed && <span className="truncate">{link.label}</span>}
               </NavLink>
             );
           })}
         </nav>
       </div>
 
-      {/* Gamification / XP Widget & Action Block */}
-      <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-        {role === 'student' && user && (
-          <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/80 space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-600 dark:text-slate-400">Learning Streak</span>
-              <span className="font-bold text-amber-600 dark:text-amber-400 flex items-center space-x-1 font-mono">
-                🔥 {user.streak_days || 7} Days
+      {/* Gamification / Streak / Sign Out Footer */}
+      <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800/60">
+        {role === 'student' && user && !collapsed && (
+          <div className="bg-slate-50 dark:bg-[#111722] rounded-xl p-3 border border-slate-200/60 dark:border-slate-800/80 space-y-1.5 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500 text-[11px]">Streak</span>
+              <span className="font-bold text-amber-500 dark:text-amber-400 font-mono text-[11px]">
+                🔥 {user.streak_days || 7}d
               </span>
             </div>
-            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-mono">
-              <span>Total XP</span>
-              <span className="text-cyan-700 dark:text-cyan-400 font-bold">{user.total_xp || 1450} XP</span>
-            </div>
-            <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-              <div className="bg-cyan-600 dark:bg-cyan-500 h-full w-[72%] rounded-full"></div>
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-cyan-500 h-full w-[72%] rounded-full"></div>
             </div>
           </div>
         )}
@@ -98,10 +113,13 @@ export const Sidebar: React.FC = () => {
             logout();
             navigate('/login');
           }}
-          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center space-x-2"
+          title={collapsed ? "Sign Out" : undefined}
+          className={`w-full rounded-lg text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center ${
+            collapsed ? 'justify-center p-2.5' : 'space-x-2.5 px-3 py-2'
+          }`}
         >
-          <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <LogOut className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
         </button>
       </div>
     </aside>

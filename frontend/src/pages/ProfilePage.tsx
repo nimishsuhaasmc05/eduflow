@@ -5,6 +5,8 @@ import { Course } from '../types';
 import { ThemeToggle } from '../components/common/ThemeToggle';
 import { getEducationImageUrl } from '../utils/images';
 import { CertificateModal } from '../components/student/CertificateModal';
+import { AffectiveHeatmap } from '../components/teacher/AffectiveHeatmap';
+import { StudentAnalyticsTable } from '../components/teacher/StudentAnalyticsTable';
 import { 
   User as UserIcon, ShieldCheck, Brain, Award, Key, Sun, Moon, 
   Activity, Clock, BookOpen, Layers, CheckCircle2, Flame, Sparkles, 
@@ -23,6 +25,7 @@ export const ProfilePage: React.FC = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [selectedCertCourse, setSelectedCertCourse] = useState<{ id: number; title: string } | null>(null);
+  const [selectedAnalyticsCourseId, setSelectedAnalyticsCourseId] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('profile');
   const [adminMetrics, setAdminMetrics] = useState<any>(null);
@@ -477,6 +480,75 @@ export const ProfilePage: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION: TEACHER STUDENT ANALYTICS & TELEMETRY */}
+      {isTeacher && (activeTab === 'profile' || activeTab === 'analytics') && (
+        <div className="bg-white dark:bg-[#11171D] rounded border border-slate-200 dark:border-[#26323A] p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-[#26323A] pb-4">
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase text-slate-900 dark:text-white flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4 text-[#0EA5E9] dark:text-[#22D3EE]" />
+                <span>STUDENT COHORT ANALYTICS & AFFECTIVE TELEMETRY</span>
+              </h2>
+              <p className="text-xs text-slate-500 font-mono mt-1">
+                Real-time MediaPipe facial & cognitive telemetry across enrolled course cohorts
+              </p>
+            </div>
+
+            {courses.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">COURSE:</span>
+                <select
+                  value={selectedAnalyticsCourseId}
+                  onChange={(e) => setSelectedAnalyticsCourseId(Number(e.target.value))}
+                  className="bg-slate-50 dark:bg-[#080B0F] border border-slate-200 dark:border-[#26323A] rounded px-3 py-1.5 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#0EA5E9] dark:focus:border-[#22D3EE]"
+                >
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* KPI Summary Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+            <div className="p-4 rounded bg-slate-50 dark:bg-[#080B0F] border border-slate-200 dark:border-[#26323A] space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase">COHORT STUDENTS</span>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">156</div>
+              <div className="text-[10px] text-emerald-500 font-bold">● Active in Hub</div>
+            </div>
+
+            <div className="p-4 rounded bg-slate-50 dark:bg-[#080B0F] border border-slate-200 dark:border-[#26323A] space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase">AVG ATTENTION</span>
+              <div className="text-2xl font-bold text-[#0EA5E9] dark:text-[#22D3EE]">88.4%</div>
+              <div className="text-[10px] text-slate-500">Target &gt; 80%</div>
+            </div>
+
+            <div className="p-4 rounded bg-slate-50 dark:bg-[#080B0F] border border-slate-200 dark:border-[#26323A] space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase">CLASS CONFUSION</span>
+              <div className="text-2xl font-bold text-amber-500">12.6%</div>
+              <div className="text-[10px] text-emerald-500">Within Safe Limits</div>
+            </div>
+
+            <div className="p-4 rounded bg-slate-50 dark:bg-[#080B0F] border border-slate-200 dark:border-[#26323A] space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase">INTERVENTIONS</span>
+              <div className="text-2xl font-bold text-purple-500">42</div>
+              <div className="text-[10px] text-slate-500">Resolved via 3D/AI</div>
+            </div>
+          </div>
+
+          {/* Timeline Affective Heatmap */}
+          <AffectiveHeatmap />
+
+          {/* Student Roster Table with Search and Status Filter */}
+          <div className="space-y-3 pt-2">
+            <StudentAnalyticsTable courseId={selectedAnalyticsCourseId} />
           </div>
         </div>
       )}

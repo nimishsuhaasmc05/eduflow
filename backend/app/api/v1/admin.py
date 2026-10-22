@@ -347,6 +347,7 @@ def list_admin_live_classes(
 
 # 7. System Monitoring
 @router.get("/system")
+@router.get("/system-metrics")
 def get_system_monitoring(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

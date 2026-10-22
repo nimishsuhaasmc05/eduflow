@@ -31,7 +31,7 @@ COURSES = [
         "description": "A beginner-friendly course covering algorithms and data structures, with a focus on how they are represented, evaluated, and used to solve computational problems. The course also explores sorting and searching algorithms, including practical examples involving arrays, linked lists, linear search, binary search, and common sorting techniques.",
         "category": "Computer Science",
         "difficulty": "Beginner to Intermediate",
-        "thumbnail_url": "https://images.unsplash.com/photo-1516116211229-5d303a841630?w=800&auto=format&fit=crop&q=80",
+        "thumbnail_url": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&auto=format&fit=crop&q=80",
         "learning_objectives": "✓ Explain what algorithms are and how they are used to solve problems.\n✓ Understand fundamental data-structure concepts.\n✓ Work with arrays and linked lists.\n✓ Explain and compare common sorting algorithms covered in the course.\n✓ Understand linear and binary searching.\n✓ Evaluate algorithm approaches at an introductory level.\n✓ Apply the concepts through quizzes and practice questions.",
         "duration_hours": 5.5,
         "rating": 4.9,

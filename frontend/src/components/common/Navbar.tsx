@@ -13,6 +13,10 @@ export const Navbar: React.FC = () => {
 
   const getStatusBadge = () => {
     switch (metrics.primary_state) {
+      case 'FOCUSED': return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
+      case 'ENGAGED': return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30';
+      case 'LOW_ENGAGEMENT': return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30';
+      case 'INSUFFICIENT_DATA': return 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/30';
       case 'CONFUSION': return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30';
       case 'DISTRACTION': return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30';
       case 'BOREDOM': return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30';

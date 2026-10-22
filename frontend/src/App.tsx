@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AffectiveProvider } from './context/AffectiveContext';
 import { Navbar } from './components/common/Navbar';
@@ -35,6 +35,8 @@ import { ThemeProvider } from './context/ThemeContext';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isEmailVerified, loading, logout, setIsEmailVerified } = useAuth();
+  const location = useLocation();
+  const isCoursePage = location.pathname.startsWith('/course/');
 
   if (loading) {
     return (
@@ -58,9 +60,9 @@ const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
         />
       )}
       <Navbar />
-      <div className="flex-1 flex">
-        <Sidebar />
-        <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
+      <div className="flex-1 flex overflow-hidden">
+        {!isCoursePage && <Sidebar />}
+        <main className={isCoursePage ? "flex-1 min-w-0 w-full overflow-hidden" : "flex-1 p-6 max-w-7xl mx-auto w-full"}>
           {children}
         </main>
       </div>

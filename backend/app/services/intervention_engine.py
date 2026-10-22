@@ -273,6 +273,45 @@ class InterventionEngine:
             cls._persist_to_db(db, student_id, intervention_id, itype, level, pre_context)
             return result
 
+        # CONFUSION / HIGH_COGNITIVE_LOAD → Concept Diagnostic Adaptive Quiz
+        if state in ("CONFUSION", "CONFUSED", "HIGH_COGNITIVE_LOAD") or (confusion >= 0.55):
+            itype = "MICRO_QUIZ"
+            message = "We noticed this concept might be challenging. Let's do a quick adaptive check to clarify any tricky points!"
+            suggested = "Take a 60-second quiz to reinforce this topic, or ask your AI Tutor in the side panel."
+            level = 3
+
+            result = {
+                "action_required": True,
+                "intervention_type": itype,
+                "message": message,
+                "suggested_content": suggested,
+                "intervention_id": intervention_id,
+                "cooldown_remaining_seconds": 0,
+                **{**pre_context, "escalation_level": level}
+            }
+            cls._record(student_id, itype, now, level, intervention_id)
+            cls._persist_to_db(db, student_id, intervention_id, itype, level, pre_context)
+            return result
+
+        # BOREDOM → Focus reset challenge
+        if state in ("BOREDOM", "BORED") or (boredom >= 0.60):
+            itype = "ATTENTION_ACTIVITY"
+            message = "Feeling sluggish? Let's take a quick 30-second focus challenge to reset your mind and regain momentum!"
+            level = 2
+
+            result = {
+                "action_required": True,
+                "intervention_type": itype,
+                "message": message,
+                "suggested_content": None,
+                "intervention_id": intervention_id,
+                "cooldown_remaining_seconds": 0,
+                **{**pre_context, "escalation_level": level}
+            }
+            cls._record(student_id, itype, now, level, intervention_id)
+            cls._persist_to_db(db, student_id, intervention_id, itype, level, pre_context)
+            return result
+
         # NEEDS_SUPPORT → Context-dependent escalation
         if state == "NEEDS_SUPPORT":
             if confusion >= 0.60:

@@ -132,7 +132,7 @@ export class ClosedLoopController {
         engagement: metrics.engagement,
         distraction: metrics.distraction,
         cognitive_load: metrics.cognitive_load,
-        learner_state: stateInfo.state,
+        learner_state: (metrics.primary_state && metrics.primary_state !== 'INSUFFICIENT_DATA') ? metrics.primary_state : stateInfo.state,
         eye_state: debug.eyeState,
         blink_count: debug.blinkCount,
         recent_quiz_score: stateInfo.context.recentQuizScore ?? undefined,
@@ -163,6 +163,10 @@ export class ClosedLoopController {
           type: itype,
           triggerReason: shouldEscalateToActivity
             ? 'Level 2 Escalation (3 Ineffective Quizzes)'
+            : metrics.primary_state === 'CONFUSION'
+            ? 'Concept Confusion Check'
+            : metrics.primary_state === 'BOREDOM'
+            ? 'Boredom Reset'
             : stateInfo.context.offTaskLikelihood === 'HIGH'
             ? 'Sustained Off-Task Behaviour'
             : stateInfo.context.knowledgeState === 'NEEDS_SUPPORT'
@@ -191,10 +195,13 @@ export class ClosedLoopController {
         this.notify(intervention);
       }
     } catch (err) {
-      // Fallback: only trigger local intervention if sustained disengagement confirmed and cooldown met
+      // Fallback: trigger local intervention if sustained disengagement confirmed and cooldown met
+      const isDistracted = (stateInfo.context.offTaskLikelihood === 'HIGH' && stateInfo.context.offTaskDurationMs >= 5000) || metrics.primary_state === 'DISTRACTION';
+      const isConfused = metrics.primary_state === 'CONFUSION' && metrics.confusion >= 0.50;
+      const isBored = metrics.primary_state === 'BOREDOM' && metrics.boredom >= 0.50;
+
       if (
-        stateInfo.context.offTaskLikelihood === 'HIGH' &&
-        stateInfo.context.offTaskDurationMs >= 5000 &&
+        (isDistracted || isConfused || isBored) &&
         (now - this.lastTriggerTime > this.minTriggerIntervalMs) &&
         !this.activeInterventionId
       ) {
@@ -202,19 +209,29 @@ export class ClosedLoopController {
         const interventionId = `INT-LOC-${Date.now().toString().slice(-6)}`;
         this.activeInterventionId = interventionId;
 
-        const isAttentionActivity = this.consecutiveIneffectiveQuizzes >= 3;
+        const isAttentionActivity = isBored || this.consecutiveIneffectiveQuizzes >= 3;
         const itype = isAttentionActivity ? 'ATTENTION_ACTIVITY' : 'MICRO_QUIZ';
 
         this.lastInterventionRecord = {
           interventionId,
           type: itype,
-          triggerReason: isAttentionActivity ? 'Level 2 Escalation (3 Ineffective Quizzes)' : 'Sustained Off-Task Behaviour (5s+)',
+          triggerReason: isBored
+            ? 'Boredom Reset'
+            : isConfused
+            ? 'Concept Confusion Check'
+            : isAttentionActivity
+            ? 'Level 2 Escalation (3 Ineffective Quizzes)'
+            : 'Sustained Off-Task Behaviour (5s+)',
           triggerScore: Math.round(metrics.attention * 100),
           triggerTimestamp: now,
           resolved: false,
         };
 
-        const msg = isAttentionActivity
+        const msg = isBored
+          ? "Feeling a bit sluggish? Let's take a quick focus challenge to reset your attention!"
+          : isConfused
+          ? "Looks like this concept might need reinforcement. Try this quick adaptive quiz to test your understanding!"
+          : isAttentionActivity
           ? "Let's switch it up for a moment. Ready for a quick focus challenge?"
           : 'Sustained off-task indicators observed. A quick interactive quiz can help re-engage!';
 

@@ -251,15 +251,16 @@ export class AttentionMonitorService {
   public deriveAffectiveMetrics(landmarks: FacialPoint[], fps: number): AffectiveMetrics {
     if (this.simulatedMetrics) {
       const attScore = (this.simulatedMetrics.attentionScore ?? 92) / 100;
-      let primary_state: 'ENGAGED' | 'CONFUSION' | 'DISTRACTION' | 'BOREDOM' | 'HIGH_COGNITIVE_LOAD' = 'ENGAGED';
-      if (attScore < 0.40) primary_state = 'DISTRACTION';
-      else if (attScore < 0.65) primary_state = 'CONFUSION';
+      let primary_state: AffectiveMetrics['primary_state'] = 'FOCUSED';
+      if (attScore >= 0.68) primary_state = 'FOCUSED';
+      else if (attScore >= 0.48) primary_state = 'ENGAGED';
+      else primary_state = 'LOW_ENGAGEMENT';
       return {
         attention: Number(attScore.toFixed(2)),
-        confusion: primary_state === 'CONFUSION' ? 0.65 : 0.10,
+        confusion: 0.10,
         boredom: 0.10,
         engagement: Number(Math.max(0.1, attScore).toFixed(2)),
-        distraction: primary_state === 'DISTRACTION' ? 0.75 : 0.10,
+        distraction: primary_state === 'LOW_ENGAGEMENT' ? 0.75 : 0.10,
         cognitive_load: 0.35,
         primary_state,
         fps
@@ -315,24 +316,44 @@ export class AttentionMonitorService {
       boredom = 0.50;
     }
 
-    let confusion = 0.12;
-    if (landmarks.length >= 336) {
+    let confusion = 0.10;
+    if (landmarks.length >= 336 && landmarks[33] && landmarks[263]) {
       const p107 = landmarks[107] || { x: 0.43, y: 0.32 };
       const p336 = landmarks[336] || { x: 0.57, y: 0.32 };
+      const p33 = landmarks[33];
+      const p263 = landmarks[263];
       const ebDist = this.dist(p107, p336);
-      if (ebDist < 0.11) {
-        confusion = Number(Math.min(1.0, 0.35 + (0.11 - ebDist) * 7.5).toFixed(2));
+      const iod = this.dist(p33, p263); // Inter-ocular distance across outer eye corners
+
+      if (iod > 0.05) {
+        const furrowRatio = ebDist / iod;
+        // Relaxed face furrowRatio is ~0.33 - 0.45. True brow compression/furrowing is < 0.28
+        if (furrowRatio < 0.28) {
+          confusion = Number(Math.min(1.0, 0.50 + (0.28 - furrowRatio) * 6.0).toFixed(2));
+        } else {
+          confusion = Number(Math.max(0.05, 0.15 - (furrowRatio - 0.28) * 0.4).toFixed(2));
+        }
       }
     }
 
-    const cognitive_load = Number(Math.min(1.0, 0.30 + (numericBpm / 60) + (Math.abs(att.headPose.pitch) / 70)).toFixed(2));
+    const cognitive_load = Number(Math.min(1.0, 0.25 + (numericBpm / 70) + (Math.abs(att.headPose.pitch) / 80)).toFixed(2));
     const engagement = Number(Math.max(0.0, Math.min(1.0, attention * (1 - distraction) * (1 - boredom))).toFixed(2));
+    const scorePercent = att.attentionScore;
+    let primary_state: AffectiveMetrics['primary_state'] = 'FOCUSED';
 
-    let primary_state: 'ENGAGED' | 'CONFUSION' | 'DISTRACTION' | 'BOREDOM' | 'HIGH_COGNITIVE_LOAD' = 'ENGAGED';
-    if (confusion >= 0.65) primary_state = 'CONFUSION';
-    else if (distraction >= 0.70) primary_state = 'DISTRACTION';
-    else if (boredom >= 0.60) primary_state = 'BOREDOM';
-    else if (cognitive_load >= 0.75) primary_state = 'HIGH_COGNITIVE_LOAD';
+    if (!att.isFaceDetected || landmarks.length === 0) {
+      primary_state = 'INSUFFICIENT_DATA';
+    } else if (distraction >= 0.55 || att.gazeDirection !== 'CENTER' || Math.abs(att.headPose.yaw) > 18 || Math.abs(att.headPose.pitch) > 18 || scorePercent < 45) {
+      primary_state = 'DISTRACTION';
+    } else if (confusion >= 0.50) {
+      primary_state = 'CONFUSION';
+    } else if (boredom >= 0.60) {
+      primary_state = 'BOREDOM';
+    } else if (scorePercent >= 68) {
+      primary_state = 'FOCUSED';
+    } else {
+      primary_state = 'ENGAGED';
+    }
 
     return {
       attention,

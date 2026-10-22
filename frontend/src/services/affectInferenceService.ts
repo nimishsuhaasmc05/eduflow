@@ -89,8 +89,8 @@ class AffectInferenceService {
     this.isInitializing = true;
 
     try {
-      // Point WASM loader at our public/ort-wasm/ directory
-      ort.env.wasm.wasmPaths = '/ort-wasm/';
+      // Point WASM loader to official CDN to prevent Vite /public ESM import restriction
+      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.29.0/dist/';
       // Single-threaded — avoids SharedArrayBuffer COEP/COOP requirement
       ort.env.wasm.numThreads = 1;
 
