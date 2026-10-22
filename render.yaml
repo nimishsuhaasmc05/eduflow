@@ -1,8 +1,9 @@
 services:
-  # FastAPI Web Service
+  # FastAPI Web Service (Render Free Tier)
   - type: web
     name: eduflow-backend
     runtime: python
+    plan: free
     rootDir: backend
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python -m alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port $PORT"
@@ -10,11 +11,6 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: eduflow-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: eduflow-redis
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
@@ -25,34 +21,9 @@ services:
       - key: GEMINI_API_KEY
         sync: false # Set in Render Dashboard
 
-  # Celery Background Worker
-  - type: worker
-    name: eduflow-celery-worker
-    runtime: python
-    rootDir: backend
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "celery -A app.workers.celery_worker.celery_app worker --loglevel=info"
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: eduflow-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: eduflow-redis
-          property: connectionString
-      - key: GEMINI_API_KEY
-        sync: false
-
 databases:
+  # PostgreSQL Database (Render Free Tier)
   - name: eduflow-db
     databaseName: eduflow
     user: eduflow_user
     plan: free
-
-# Render managed Redis
-redis:
-  - name: eduflow-redis
-    plan: free
-    ipAllowList: []
