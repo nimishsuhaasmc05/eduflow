@@ -14,7 +14,13 @@ Base.metadata.create_all(bind=engine)
 try:
     from sqlalchemy import text
     with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR;"))
+        conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS status VARCHAR DEFAULT 'published';"))
+        conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS learning_objectives TEXT;"))
+        conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS duration_hours FLOAT DEFAULT 5.0;"))
+        conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS rating FLOAT DEFAULT 4.8;"))
         conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;"))
+        conn.execute(text("ALTER TABLE course_modules ADD COLUMN IF NOT EXISTS description TEXT;"))
         conn.execute(text("ALTER TABLE course_modules ADD COLUMN IF NOT EXISTS source_type VARCHAR DEFAULT 'url';"))
         conn.commit()
 except Exception as migration_err:
@@ -104,8 +110,15 @@ def seed_database():
     from app.core.database import engine
     try:
         with engine.connect() as conn:
-            conn.execute(text("ALTER TABLE live_classes ADD COLUMN IF NOT EXISTS ended_at TIMESTAMP;"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR;"))
+            conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS status VARCHAR DEFAULT 'published';"))
+            conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS learning_objectives TEXT;"))
+            conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS duration_hours FLOAT DEFAULT 5.0;"))
+            conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS rating FLOAT DEFAULT 4.8;"))
+            conn.execute(text("ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;"))
+            conn.execute(text("ALTER TABLE course_modules ADD COLUMN IF NOT EXISTS description TEXT;"))
             conn.execute(text("ALTER TABLE course_modules ADD COLUMN IF NOT EXISTS source_type VARCHAR DEFAULT 'url';"))
+            conn.execute(text("ALTER TABLE live_classes ADD COLUMN IF NOT EXISTS ended_at TIMESTAMP;"))
             conn.execute(text("ALTER TABLE intervention_logs ADD COLUMN IF NOT EXISTS escalation_level INTEGER DEFAULT 1;"))
             conn.execute(text("ALTER TABLE intervention_logs ADD COLUMN IF NOT EXISTS pre_state VARCHAR DEFAULT 'FOCUSED';"))
             conn.execute(text("ALTER TABLE intervention_logs ADD COLUMN IF NOT EXISTS pre_attention FLOAT;"))
