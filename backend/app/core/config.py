@@ -52,6 +52,8 @@ class Settings(BaseSettings):
 
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
+        origin.strip() for origin in os.getenv("BACKEND_CORS_ORIGINS", "").split(",") if origin.strip()
+    ] or [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",
